@@ -22,7 +22,7 @@ static SPECIAL_CHARS : Lazy<Vec<char>> = Lazy::new(||
 
 #[tokio::main(flavor = "multi_thread", worker_threads = 8)]
 async fn main() {
-    let port = "127.0.0.1::8080";
+    let port = "127.0.0.1:8080";
     let listener = TcpListener::bind(port).await.expect("Failed to bind");
     println!("Listening on {}",port);
     loop {
@@ -167,6 +167,13 @@ match command.name.to_lowercase().as_str() {
         Ok(())
     }
 
+	"special_key_click" =>
+    {
+        println!("CLicking {}" ,&command.args[0]);
+        handle_special_key_click(&command.args[0]);
+        Ok(())
+    }
+
     _ =>
     {
         println!("{} is not a valid command!", command.name );
@@ -235,7 +242,7 @@ async fn handle_special_key_toggle(key : &String)
 {
     let mut enigo = Enigo::new(&Settings::default()).unwrap();
 
-    match key.as_str() {
+    match key.to_lowercase().as_str() {
         "capslock" =>
         {
             println!("Toggling Caps Lock!");
@@ -322,5 +329,41 @@ async fn handle_volume_control(amt : i32)
 	{
 		let _ = enigo.key(volume_direction, Click);
 		tokio::time::sleep(delay).await;
+	}
+}
+
+fn handle_special_key_click(input : &str)
+{
+	let mut enigo = Enigo::new(&Settings::default()).unwrap();
+
+	match input.to_lowercase().as_str()
+	{
+		"play" =>
+		{
+			let _ = enigo.key(Key::MediaPlayPause, Click);
+		}
+
+		"next" =>
+		{
+			let _ = enigo.key(Key::MediaNextTrack, Click);
+
+		}
+		"previous" =>
+		{
+			let _ = enigo.key(Key::MediaPrevTrack, Click);
+
+		}
+		"stop" =>
+		{
+			let _ = enigo.key(Key::MediaStop, Click);
+
+		}
+		"mute_volume" =>
+		{
+			let _ = enigo.key(Key::VolumeMute, Click);
+
+		}
+		
+		_ =>{println!("Unknown Special Key")}
 	}
 }

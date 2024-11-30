@@ -102,6 +102,33 @@ Example:
 }
 ```
 
+volume_control
+- Args:  ```"x"```
+  - Increases volume by specified ammount
+
+Example:
+```
+{
+"name": "volume_control",
+"args": ["12"]
+}
+```
+
+special_key_click
+- Args:  ```"key"```
+  - Clicks the specified special key (e.g., MediaPlay).
+  > Options : "play", "next", "previous", "stop", "mute_volume"
+
+Example:
+```
+{
+"name": "special_key_click",
+"args": ["play"]
+}
+```
+
+
+
 ## Example
 To send a command to the program, you can use a tool like netcat or telnet to send a JSON string over a socket:
 ```
@@ -115,11 +142,12 @@ This will move the mouse by 100 units along the X-axis and 50 units along the Y-
 - [x] Mouse Scrolling
 - [x] Typing
 - [x] Toggling Caps Lock
+- [x] Volume Control
+- [x] Media Controls
 - [ ] Holding Keys (Shift, Alt, Ctrl etc..)
-- [ ] Volume Control
 - [ ] Function Keys
 - [ ] Window Control
-- [ ]  Bluetooth capabilites
+- [ ] Bluetooth capabilites
 
 
 ## Notes
