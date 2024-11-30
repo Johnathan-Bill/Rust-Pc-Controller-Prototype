@@ -22,7 +22,7 @@ static SPECIAL_CHARS : Lazy<Vec<char>> = Lazy::new(||
 
 #[tokio::main(flavor = "multi_thread", worker_threads = 8)]
 async fn main() {
-    let port = "127.0.0.1";
+    let port = "127.0.0.1::8080";
     let listener = TcpListener::bind(port).await.expect("Failed to bind");
     println!("Listening on {}",port);
     loop {
