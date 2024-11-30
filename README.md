@@ -1,4 +1,4 @@
-# Rust Socket JSON Handler & Mouse Control
+# Rust Pc Controller Prototype
 This program, written in Rust, listens on a local socket and processes incoming JSON data to control mouse movements, clicks, scrolling, and typing. It is powered by asynchronous programming using tokio and utilizes the serde library for JSON deserialization. The program is designed to be a flexible tool for controlling a mouse through socket commands, with options to handle special key toggles and keyboard inputs.
 
 ## Why
