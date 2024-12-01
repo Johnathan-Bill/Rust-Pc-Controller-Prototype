@@ -114,7 +114,7 @@ Example:
 }
 ```
 
-special_key_click
+media_key_click
 - Args:  ```"key"```
   - Clicks the specified special key (e.g., MediaPlay).
   > Options : "play", "next", "previous", "stop", "mute_volume"
@@ -124,6 +124,19 @@ Example:
 {
 "name": "special_key_click",
 "args": ["play"]
+}
+```
+
+function_key_click
+- Args:  ```"key"```
+  - Clicks the specified special key (e.g., 11).
+  > Options : "1", "2", "3", "4", "5", "6", "7", "8", "9", "10","11","12"
+
+Example:
+```
+{
+"name": "function_key_click",
+"args": ["11"]
 }
 ```
 
@@ -144,8 +157,8 @@ This will move the mouse by 100 units along the X-axis and 50 units along the Y-
 - [x] Toggling Caps Lock
 - [x] Volume Control
 - [x] Media Controls
+- [x] Function Keys
 - [ ] Holding Keys (Shift, Alt, Ctrl etc..)
-- [ ] Function Keys
 - [ ] Window Control
 - [ ] Bluetooth capabilites
 

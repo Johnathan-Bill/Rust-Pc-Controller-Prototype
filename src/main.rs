@@ -94,7 +94,7 @@ handle_command(command).await
 
 async fn handle_command(command : Command) -> Result<(), String>
 {
-
+    let mut enigo = Enigo::new(&Settings::default()).unwrap();
 match command.name.to_lowercase().as_str() {  
     "add" => {
 
@@ -116,7 +116,7 @@ match command.name.to_lowercase().as_str() {
         println!("Moving Mouse");
         
 
-        handle_mouse_move(command.args[0].parse::<i32>().unwrap_or(0),command.args[1].parse::<i32>().unwrap_or(0)).await;
+        handle_mouse_move(command.args[0].parse::<i32>().unwrap_or(0),command.args[1].parse::<i32>().unwrap_or(0), &mut enigo).await;
         
 
     
@@ -128,7 +128,7 @@ match command.name.to_lowercase().as_str() {
         println!("Mouse Click");
         
 
-        handle_mouse_click(&command.args[0]).await;
+        handle_mouse_click(&command.args[0], &mut enigo).await;
         Ok(())
     }
 
@@ -136,7 +136,7 @@ match command.name.to_lowercase().as_str() {
     {
         println!("Mouse Click");
 
-        handle_scroll(command.args[0].parse::<i32>().unwrap_or(0)).await;
+        handle_scroll(command.args[0].parse::<i32>().unwrap_or(0), &mut enigo).await;
         Ok(())
     }
 
@@ -146,7 +146,7 @@ match command.name.to_lowercase().as_str() {
 
         println!("Typing {}" ,&command.args[0]);
 
-        handle_typing(&command.args[0]).await;
+        handle_typing(&command.args[0],&mut enigo).await;
 
 
         Ok(())
@@ -156,23 +156,31 @@ match command.name.to_lowercase().as_str() {
 	"volume_control" =>
     {
         println!("Controling Volume");
-        handle_volume_control(command.args[0].parse::<i32>().unwrap_or(0)).await;
+        handle_volume_control(command.args[0].parse::<i32>().unwrap_or(0), &mut enigo).await;
         Ok(())
     }
 
     "special_key_toggle" =>
     {
         println!("Toggling {}" ,&command.args[0]);
-        handle_special_key_toggle(&command.args[0]).await;
+        handle_special_key_toggle(&command.args[0], &mut enigo).await;
         Ok(())
     }
 
-	"special_key_click" =>
+	"media_key_click" =>
     {
         println!("CLicking {}" ,&command.args[0]);
-        handle_special_key_click(&command.args[0]);
+        handle_media_key_click(&command.args[0], &mut enigo);
         Ok(())
     }
+
+	"function_key_click" =>
+    {
+        println!("CLicking F{}" ,&command.args[0]);
+        handle_function_key_click(command.args[0].parse::<i32>().unwrap_or(0), &mut enigo);
+        Ok(())
+    }
+
 
     _ =>
     {
@@ -184,9 +192,9 @@ match command.name.to_lowercase().as_str() {
 
 
 
-async fn handle_mouse_move(x : i32 , y : i32)
+async fn handle_mouse_move(x : i32 , y : i32, enigo : &mut Enigo)
 {
-    let mut enigo = Enigo::new(&Settings::default()).unwrap();
+
     let mut t: f32 = 0.05;
 
     let delay = std::time::Duration::from_millis(5);
@@ -216,9 +224,8 @@ fn quadratic_ease_in_out(t : f32) -> f32
     }
 }
 
-async fn handle_typing(input : &String)
+async fn handle_typing(input : &String, enigo : &mut Enigo)
 {
-    let mut enigo = Enigo::new(&Settings::default()).unwrap();
         
     let delay = std::time::Duration::from_millis(10);
     
@@ -226,7 +233,7 @@ async fn handle_typing(input : &String)
     {
         if SPECIAL_CHARS.contains(&c)
         {
-            handle_special_char(&c);
+            handle_special_char(&c,enigo);
         }
         else
         {
@@ -238,9 +245,8 @@ async fn handle_typing(input : &String)
     }
     
 }
-async fn handle_special_key_toggle(key : &String)
+async fn handle_special_key_toggle(key : &String, enigo : &mut Enigo)
 {
-    let mut enigo = Enigo::new(&Settings::default()).unwrap();
 
     match key.to_lowercase().as_str() {
         "capslock" =>
@@ -256,9 +262,8 @@ async fn handle_special_key_toggle(key : &String)
     }
 }
 
-fn handle_special_char(c : &char)
+fn handle_special_char(c : &char, enigo : &mut Enigo)
 {
-    let mut enigo = Enigo::new(&Settings::default()).unwrap();
 
 
     match c 
@@ -284,9 +289,8 @@ fn handle_special_char(c : &char)
     }
 }
 
-async fn handle_mouse_click(input : &String)
+async fn handle_mouse_click(input : &String, enigo : &mut Enigo)
 {
-    let mut enigo = Enigo::new(&Settings::default()).unwrap();
     match input.to_lowercase().as_str()
     {
 
@@ -304,11 +308,10 @@ async fn handle_mouse_click(input : &String)
     }
 }
 
-async fn handle_scroll(amt : i32)
+async fn handle_scroll(amt : i32, enigo : &mut Enigo)
 {
     let direction = if amt > 0 {1} else if amt < 0 {-1} else {0};
 
-    let mut enigo = Enigo::new(&Settings::default()).unwrap();
 
     let delay = std::time::Duration::from_millis(10);
     for _ in 0..amt.abs()
@@ -318,9 +321,8 @@ async fn handle_scroll(amt : i32)
         tokio::time::sleep(delay).await;
     }
 }
-async fn handle_volume_control(amt : i32)
+async fn handle_volume_control(amt : i32, enigo : &mut Enigo)
 {
-	let mut enigo = Enigo::new(&Settings::default()).unwrap();
 
 	let volume_direction : Key = if amt > 0 {Key::VolumeUp} else {Key::VolumeDown};
 
@@ -332,9 +334,8 @@ async fn handle_volume_control(amt : i32)
 	}
 }
 
-fn handle_special_key_click(input : &str)
+fn handle_media_key_click(input : &str, enigo : &mut Enigo)
 {
-	let mut enigo = Enigo::new(&Settings::default()).unwrap();
 
 	match input.to_lowercase().as_str()
 	{
@@ -361,6 +362,76 @@ fn handle_special_key_click(input : &str)
 		"mute_volume" =>
 		{
 			let _ = enigo.key(Key::VolumeMute, Click);
+
+		}
+		
+		_ =>{println!("Unknown Special Key")}
+}
+}
+
+fn handle_function_key_click(input : i32, enigo : &mut Enigo)
+{
+
+	match input
+	{
+		1 =>
+		{
+			let _ = enigo.key(Key::F1, Click);
+		}
+
+		2 =>
+		{
+			let _ = enigo.key(Key::F2, Click);
+
+		}
+		3 =>
+		{
+			let _ = enigo.key(Key::F3, Click);
+		}
+
+		4 =>
+		{
+			let _ = enigo.key(Key::F4, Click);
+
+		}
+		5 =>
+		{
+			let _ = enigo.key(Key::F5, Click);
+
+		}
+		6 =>
+		{
+			let _ = enigo.key(Key::F6, Click);
+
+		}
+		7 =>
+		{
+			let _ = enigo.key(Key::F7, Click);
+
+		}
+		8 =>
+		{
+			let _ = enigo.key(Key::F8, Click);
+
+		}
+		9 =>
+		{
+			let _ = enigo.key(Key::F9, Click);
+
+		}
+		10 =>
+		{
+			let _ = enigo.key(Key::F10, Click);
+
+		}
+		11 =>
+		{
+			let _ = enigo.key(Key::F11, Click);
+
+		}
+		12 =>
+		{
+			let _ = enigo.key(Key::F12, Click);
 
 		}
 		
