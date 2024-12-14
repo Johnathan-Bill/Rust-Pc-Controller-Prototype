@@ -158,7 +158,7 @@ This will move the mouse by 100 units along the X-axis and 50 units along the Y-
 - [x] Volume Control
 - [x] Media Controls
 - [x] Function Keys
-- [ ] Holding Keys (Shift, Alt, Ctrl etc..)
+- [x] Holding Keys (Shift, Alt, Ctrl etc..)
 - [ ] Window Control
 - [ ] Bluetooth capabilites
 
