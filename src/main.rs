@@ -69,8 +69,16 @@ async fn handle_connection(mut socket: tokio::net::TcpStream) -> io::Result<()> 
                 }
 
 				
-                Err(_) => {
-                    println!("Invalid Command. Continuing");
+                Err(e) => {
+
+					if e.to_string().contains("EOF")
+					{
+						println!("Reading more data");
+					}
+					else {
+						data.clear();
+						println!("Invalid Command. Continuing {}",e);
+					}
                     // return Ok(());
                 }
             };
@@ -84,6 +92,7 @@ async fn handle_connection(mut socket: tokio::net::TcpStream) -> io::Result<()> 
 
 fn parse_command(data: &[u8]) -> Result<Command, JsonError> {
     let command_str = String::from_utf8_lossy(data).to_string();
+	// println!("Parsed : {}",command_str);
     serde_json::from_str(&command_str)
 }
 
