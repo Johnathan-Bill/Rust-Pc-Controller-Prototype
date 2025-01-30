@@ -6,7 +6,7 @@ This project is a prototype of a socket server designed to integrate with a Taur
 
 The mobile app will translate touch controls into commands, which will then be sent to and received by the local host. This setup allows the user to interact with the desktop application through their mobile device.
 
-## Curent Goal
+## Current Goal
 Swapping current active window via Command from client using windows crate. (Only Windows OS at the current moment)
 
 ## Dependencies
