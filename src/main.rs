@@ -100,11 +100,7 @@ fn parse_command(data: &[u8]) -> Result<Command, JsonError> {
     serde_json::from_str(&command_str)
 }
 
-async fn handle_command(
-    command: Command,
-    enigo: &mut Enigo,
-    key_held: &mut [bool; 3],
-) -> Result<(), String> {
+async fn handle_command( command: Command, enigo: &mut Enigo, key_held: &mut [bool; 3]) -> Result<(), String> {
     match command.name.to_lowercase().as_str() {
         "add" => {
             let sum: i32 = command

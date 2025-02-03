@@ -6,6 +6,9 @@ This project is a prototype of a socket server designed to integrate with a Taur
 
 The mobile app will translate touch controls into commands, which will then be sent to and received by the local host. This setup allows the user to interact with the desktop application through their mobile device.
 
+## Current Goal
+Swapping current active window via Command from client using windows crate. (Only Windows OS at the current moment)
+
 ## Dependencies
 The following dependencies are used in the project:
 
@@ -161,6 +164,7 @@ This will move the mouse by 100 units along the X-axis and 50 units along the Y-
 - [x] Holding Keys (Shift, Alt, Ctrl etc..)
 - [ ] Window Control
 - [ ] Bluetooth capabilites
+- [ ] Roku Tv Control Options
 
 
 ## Notes
