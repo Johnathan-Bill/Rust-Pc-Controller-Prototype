@@ -36,7 +36,20 @@ IsIconic, ShowWindow, SetForegroundWindow, SW_RESTORE},
 
             windows
         }
-    }        
+    }
+
+	pub fn set_active_window(&mut self, i : i32)
+	{
+		let index = i as usize;
+		unsafe 
+		{
+			if IsIconic(self.open_windows[index].hwnd).as_bool()
+			{
+				let _  =  ShowWindow(self.open_windows[index].hwnd, SW_RESTORE);
+			}
+			let _ = SetForegroundWindow(self.open_windows[index].hwnd);
+		}    
+	}
 
     unsafe extern "system" fn get_window_names_proc(hwnd : HWND, lparam : LPARAM) -> BOOL
     {

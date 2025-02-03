@@ -143,6 +143,32 @@ Example:
 }
 ```
 
+get_open_windows
+- Args:  ```""```
+  - Gets a string of open windows (e.g., 0 : Steam).
+  > Options : ""
+
+Example:
+```
+{
+"name": "get_open_windows",
+"args": [""]
+}
+```
+
+set_active_window
+- Args:  ```"i"```
+  - Sets the current active window (e.g.Steam).
+  > Options : "0-n where n is the final open window"
+
+Example:
+```
+{
+"name": "set_active_window",
+"args": ["1"]
+}
+```
+
 
 
 ## Example
@@ -162,7 +188,7 @@ This will move the mouse by 100 units along the X-axis and 50 units along the Y-
 - [x] Media Controls
 - [x] Function Keys
 - [x] Holding Keys (Shift, Alt, Ctrl etc..)
-- [ ] Window Control
+- [x] Window Control
 - [ ] Bluetooth capabilites
 - [ ] Roku Tv Control Options
 

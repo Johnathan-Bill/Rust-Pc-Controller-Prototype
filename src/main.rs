@@ -12,7 +12,7 @@ use serde::{
     Deserialize, Serialize,
 };
 use serde_json::Error as JsonError;
-use tokio::io::{self, AsyncReadExt};
+use tokio::io::{self, AsyncReadExt, AsyncWriteExt};
 use tokio::net::TcpListener;
 
 
@@ -90,7 +90,7 @@ async fn handle_connection(mut socket: tokio::net::TcpStream) -> io::Result<()> 
                 }
             };
         }
-        handle_command(command, &mut enigo, &mut key_held, &mut window_controller)
+        handle_command(command, &mut enigo, &mut key_held, &mut window_controller, &mut socket)
             .await
             .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e))?;
 		data.clear();
@@ -103,7 +103,7 @@ fn parse_command(data: &[u8]) -> Result<Command, JsonError> {
     serde_json::from_str(&command_str)
 }
 
-async fn handle_command( command: Command, enigo: &mut Enigo, key_held: &mut [bool; 3], window_controller : &mut window_controller::WindowController) -> Result<(), String> {
+async fn handle_command( command: Command, enigo: &mut Enigo, key_held: &mut [bool; 3], window_controller : &mut window_controller::WindowController, socket : &mut tokio::net::TcpStream) -> Result<(), String> {
     match command.name.to_lowercase().as_str() {
         "add" => {
             let sum: i32 = command
@@ -183,15 +183,16 @@ async fn handle_command( command: Command, enigo: &mut Enigo, key_held: &mut [bo
 
         "get_open_windows" =>
         {
-            let _ = window_controller.get_open_windows();
-
-            for w in &window_controller.open_windows
-            {
-                println!("{}", w.title)
-            }
+            handle_get_open_window(window_controller,socket).await;
 
             Ok(())
         }
+
+		"set_active_window" =>
+		{
+			handle_set_active_window(window_controller, command.args[0].parse::<i32>().unwrap_or(0)).await;
+			Ok(())
+		}
 
         _ => {
             println!("{} is not a valid command!", command.name);
@@ -399,4 +400,23 @@ fn handle_toggle_key_hold(input: &str, enigo: &mut Enigo, key_held: &mut [bool; 
             println!("Unknown Key")
         }
     }
+}
+
+async fn handle_get_open_window(window_controller : &mut window_controller::WindowController, socket : &mut tokio::net::TcpStream)
+{
+	let _ = window_controller.get_open_windows();
+	let msg: String = window_controller
+    .open_windows
+    .iter()
+    .enumerate()
+    .map(|(i, w)| format!("\n{}: {}", i, w.title))
+    .collect();
+
+	if let Err(e) = socket.write_all(msg.as_bytes()).await {
+        eprintln!("Failed to send message to client: {}", e);
+    }
+}
+async fn handle_set_active_window(window_controller : &mut window_controller::WindowController, i : i32)
+{
+	window_controller.set_active_window(i);
 }
