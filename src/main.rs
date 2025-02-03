@@ -13,6 +13,7 @@ use serde_json::Error as JsonError;
 use tokio::io::{self, AsyncReadExt};
 use tokio::net::TcpListener;
 
+mod window_controller;
 #[derive(Serialize, Deserialize, Debug)]
 struct Command {
     name: String,
@@ -24,6 +25,9 @@ static SPECIAL_CHARS: Lazy<Vec<char>> = Lazy::new(|| vec!['\t', '\n', '\r', '\x0
 #[tokio::main(flavor = "multi_thread", worker_threads = 8)]
 async fn main() {
     let port = "127.0.0.1:8080";
+
+    let wndcon = window_controller::WindowController::new("Windows".to_string());
+
     let listener = TcpListener::bind(port).await.expect("Failed to bind");
     println!("Listening on {}", port);
     loop {
