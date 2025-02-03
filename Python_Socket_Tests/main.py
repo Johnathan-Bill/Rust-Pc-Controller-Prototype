@@ -6,8 +6,8 @@ s = socket.socket()
 s.connect(("127.0.0.1",8080))
 
 data = {
-    "name":"type",
-    "args":["20","20"]   
+    "name":"get_open_windows",
+    "args":[]   
 }
 
 s.send(json.dumps(data).encode())

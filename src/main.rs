@@ -1,4 +1,6 @@
-use std::{io::Read, vec};
+mod window_controller;
+
+use std::vec;
 
 use enigo::{
     Axis, Button, Coordinate,
@@ -13,7 +15,7 @@ use serde_json::Error as JsonError;
 use tokio::io::{self, AsyncReadExt};
 use tokio::net::TcpListener;
 
-mod window_controller;
+
 #[derive(Serialize, Deserialize, Debug)]
 struct Command {
     name: String,
@@ -26,7 +28,7 @@ static SPECIAL_CHARS: Lazy<Vec<char>> = Lazy::new(|| vec!['\t', '\n', '\r', '\x0
 async fn main() {
     let port = "127.0.0.1:8080";
 
-    let wndcon = window_controller::WindowController::new("Windows".to_string());
+
 
     let listener = TcpListener::bind(port).await.expect("Failed to bind");
     println!("Listening on {}", port);
@@ -48,6 +50,7 @@ async fn main() {
 async fn handle_connection(mut socket: tokio::net::TcpStream) -> io::Result<()> {
     let mut enigo = Enigo::new(&Settings::default()).unwrap();
     let mut key_held: [bool; 3] = [false, false, false]; // shitft, alt, control
+    let mut window_controller = window_controller::WindowController::new("Windows".to_string());
     println!("Socket Opened");
 
     let mut buf = vec![0u8; 1024];
@@ -87,7 +90,7 @@ async fn handle_connection(mut socket: tokio::net::TcpStream) -> io::Result<()> 
                 }
             };
         }
-        handle_command(command, &mut enigo, &mut key_held)
+        handle_command(command, &mut enigo, &mut key_held, &mut window_controller)
             .await
             .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e))?;
 		data.clear();
@@ -100,7 +103,7 @@ fn parse_command(data: &[u8]) -> Result<Command, JsonError> {
     serde_json::from_str(&command_str)
 }
 
-async fn handle_command( command: Command, enigo: &mut Enigo, key_held: &mut [bool; 3]) -> Result<(), String> {
+async fn handle_command( command: Command, enigo: &mut Enigo, key_held: &mut [bool; 3], window_controller : &mut window_controller::WindowController) -> Result<(), String> {
     match command.name.to_lowercase().as_str() {
         "add" => {
             let sum: i32 = command
@@ -175,6 +178,18 @@ async fn handle_command( command: Command, enigo: &mut Enigo, key_held: &mut [bo
         "toggle_key_hold" => {
             println!("Toggling {}", &command.args[0]);
             handle_toggle_key_hold(&command.args[0], enigo, key_held);
+            Ok(())
+        }
+
+        "get_open_windows" =>
+        {
+            let _ = window_controller.get_open_windows();
+
+            for w in &window_controller.open_windows
+            {
+                println!("{}", w.title)
+            }
+
             Ok(())
         }
 
