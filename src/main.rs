@@ -52,33 +52,73 @@ async fn handle_connection(mut socket: tokio::net::TcpStream) -> io::Result<()> 
     let mut key_held: [bool; 3] = [false, false, false]; // shitft, alt, control
     let mut window_controller = window_controller::WindowController::new("Windows".to_string());
     println!("Socket Opened");
-
-    let mut buf = vec![0u8; 1024];
-
+    
+    let mut buf = vec![0u8; 3072];
+    
     let mut data: Vec<u8> = Vec::new();
 
+    let mut stop_reading : bool = false;
+    
     let mut command: Command;
     loop {
         loop {
-            let n = socket.read(&mut buf).await?;
+            
+            if stop_reading
+            {
+                println!("Pausing data reception temporarily.");
+                let mut trash = vec![0u8; 1024];
 
+                loop {
+                    match  socket.try_read(&mut trash) {
+                        Ok(0) =>
+                        {
+                            println!("Socket Flushed!");
+                            break;
+                        }
+                        Ok(n) =>
+                        {
+
+                        }
+                        Err(ref e) if e.kind() == io::ErrorKind::WouldBlock =>
+                        {
+                            println!("Socket Flushed!");
+                            break;
+                        }
+                        Err(e) =>
+                        {
+                            println!("{}\nContinuing!",e)
+                        }
+                    }
+                }
+
+                stop_reading = false;
+                continue;
+
+            }
+            
+            let n = socket.read(&mut buf).await?;
             if n == 0 {
                 println!("Connection Closed");
 				return  Ok(());
             }
 
             data.extend_from_slice(&buf[..n]);
-			println!("{}",n);
             match parse_command(&data) {
                 Ok(c) => {
                     command = c;
                     break;
                 }
-
 				
                 Err(e) => {
 
-					if e.to_string().contains("EOF")
+                    if data.len() > 16384 
+                    {
+                        println!("Sent data is too large. Clearing buffer {}",e);
+                        stop_reading = true;
+
+                        data.clear();
+                    }
+					else if e.to_string().contains("EOF")
 					{
 						println!("Reading more data");
 					}

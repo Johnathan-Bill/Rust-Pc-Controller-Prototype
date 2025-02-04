@@ -9,7 +9,8 @@ IsIconic, ShowWindow, SetForegroundWindow, SW_RESTORE},
         pub title : String,
         hwnd : HWND
     }
-    #[derive(Clone)]
+
+    #[allow(dead_code)]
     pub struct WindowController
     {
         pub os: String,
