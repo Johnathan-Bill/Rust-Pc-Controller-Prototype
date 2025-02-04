@@ -23,7 +23,7 @@ struct Command {
 }
 // 0 = shift 1 = control 2 = alt
 static SPECIAL_CHARS: Lazy<Vec<char>> = Lazy::new(|| vec!['\t', '\n', '\r', '\x08']);
-
+static MAX_DATA_SIZE : usize = 16384;
 #[tokio::main(flavor = "multi_thread", worker_threads = 8)]
 async fn main() {
     let port = "127.0.0.1:8080";
@@ -60,6 +60,7 @@ async fn handle_connection(mut socket: tokio::net::TcpStream) -> io::Result<()> 
     let mut stop_reading : bool = false;
     
     let mut command: Command;
+    
     loop {
         loop {
             
@@ -111,7 +112,7 @@ async fn handle_connection(mut socket: tokio::net::TcpStream) -> io::Result<()> 
 				
                 Err(e) => {
 
-                    if data.len() > 16384 
+                    if data.len() > MAX_DATA_SIZE
                     {
                         println!("Sent data is too large. Clearing buffer {}",e);
                         stop_reading = true;
